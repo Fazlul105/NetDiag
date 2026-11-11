@@ -1,0 +1,16 @@
+.gradle/
+.kotlin/
+.idea/
+**/build/
+local.properties
+*.iml
+.cxx/
+.externalNativeBuild/
+recordings/
+*.jks
+*.keystore
+tools/local-env.ps1
+.env
+.env.*
+!.env.example
+*.log

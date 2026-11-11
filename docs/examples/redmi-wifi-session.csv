@@ -1,0 +1,8 @@
+wall_time_utc,elapsed_realtime_ns,event,network,detail
+"2026-11-11T18:47:48.927385Z","441447912064492","SESSION_START","245","Wi-Fi | Internet validated"
+"2026-11-11T18:47:53.325497Z","441452310178657","LOST","245","Default network lost"
+"2026-11-11T18:48:00.604493Z","441459589189331","AVAILABLE","246","Network available; checking capabilities"
+"2026-11-11T18:48:00.607325Z","441459592014435","CAPABILITIES","246","Wi-Fi | Internet not validated"
+"2026-11-11T18:48:02.915477Z","441461900159122","CAPABILITIES","246","Wi-Fi | Internet not validated"
+"2026-11-11T18:48:03.200241Z","441462184921986","CAPABILITIES","246","Wi-Fi | Internet validated"
+"2026-11-11T18:48:11.416620Z","441470401298962","SESSION_STOP","246","User stopped recording"
