@@ -18,6 +18,7 @@ Device: Redmi Note 11, Android 13 / API 33. Date: 12 November 2026, Asia/Dhaka.
 | Android debug build | Passed |
 | JVM unit tests | 7 passed |
 | Native socket tests executed on Android ARM64 | 10 passed |
+| Portable native socket tests on Linux CI | 10 passed |
 | Android JNI and ViewModel integration tests | 7 passed, 0 failures/errors/skips |
 | Android lint | 0 errors; 7 dependency-update advisories |
 | Debug APK signature | Verified |
@@ -33,8 +34,8 @@ based UI test launch stalled on this Redmi. The app opened normally through ADB;
 those stalled tests were replaced by direct controller integration tests. Button
 interaction was then checked manually, and the UDP result was captured.
 
-Linux host tests are configured in the native-tests CI job. Its run status is
-visible in GitHub Actions for the feature branch.
+Linux host tests passed in the native-tests CI job. The Android build, JVM
+tests, and lint also passed in the [feature-branch CI run](https://github.com/Fazlul105/NetDiag/actions/runs/43176397418).
 
 ## Manual result
 

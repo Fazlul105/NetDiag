@@ -42,6 +42,7 @@ The v0.1 screenshots below show the same seven-event connectivity session:
 | Debug APK build | Passed |
 | JVM unit tests | 7 passed |
 | C++ socket tests on Android ARM64 | 10 passed |
+| Portable C++ socket tests on Linux CI | 10 passed |
 | Android JNI/ViewModel integration tests | 7 passed |
 | Manual TCP/UDP app controls | User confirmed both OK; UDP result captured |
 | Android lint | 0 errors; 7 version-update advisories |
@@ -78,7 +79,7 @@ Set `JAVA_HOME` to JDK 21 and `ANDROID_HOME` to your Android SDK. Android Studio
 can also configure an ignored `local.properties` with your SDK location.
 
 ```sh
-git clone https://github.com/Fazlul105/NetDiag.git
+git clone --branch feat/native-diagnostics https://github.com/Fazlul105/NetDiag.git
 cd NetDiag
 ./gradlew --no-daemon assembleDebug testDebugUnitTest lintDebug
 ```
