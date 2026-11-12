@@ -1,11 +1,11 @@
 # NetDiag — Android Connectivity Diagnostics
 
-[![Android build](https://github.com/Fazlul105/NetDiag/actions/workflows/android.yml/badge.svg?branch=feat%2Fnative-diagnostics)](https://github.com/Fazlul105/NetDiag/actions/workflows/android.yml)
+[![Android build](https://github.com/Fazlul105/NetDiag/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/Fazlul105/NetDiag/actions/workflows/android.yml)
 
 A Kotlin and Jetpack Compose app that records Android network changes and runs
 C++ TCP-connect and UDP-echo diagnostics through the Android NDK and JNI.
 
-**Status: working v0.2 feature branch, in development.** Tested on a Redmi Note 11
+**Version 0.2.** Tested on a Redmi Note 11
 running Android 13. C++ TCP/UDP probes, JNI integration, cancellation, and native
 tests are implemented. AIDL and audio transport remain planned milestones.
 
@@ -79,7 +79,7 @@ Set `JAVA_HOME` to JDK 21 and `ANDROID_HOME` to your Android SDK. Android Studio
 can also configure an ignored `local.properties` with your SDK location.
 
 ```sh
-git clone --branch feat/native-diagnostics https://github.com/Fazlul105/NetDiag.git
+git clone https://github.com/Fazlul105/NetDiag.git
 cd NetDiag
 ./gradlew --no-daemon assembleDebug testDebugUnitTest lintDebug
 ```

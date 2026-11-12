@@ -2,7 +2,7 @@ name: Android build
 
 on:
   push:
-    branches: [main, feat/native-diagnostics]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
