@@ -52,5 +52,8 @@ Repeatability, new-session reset, rotation, backgrounding, canceled export,
 Wi-Fi without internet, and Wi-Fi/mobile transition checks remain pending in
 [the device checklist](DEVICE_TESTS.md).
 
-C++ TCP/UDP diagnostics, JNI, AIDL, and audio transport are planned milestones.
-No AOSP HAL, Linux driver, or physical bus integration is claimed.
+C++ TCP/UDP diagnostics and JNI were subsequently implemented and verified in
+the [v0.2 native milestone](results/2026-11-12-native-diagnostics.md). That report
+records its separate APK and test results. The v0.1 hash above still identifies
+the original connectivity-recording device test. AIDL and audio transport remain
+planned; no AOSP HAL, Linux driver, or physical bus integration is claimed.

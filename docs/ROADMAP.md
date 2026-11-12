@@ -2,9 +2,11 @@
 
 1. Connectivity recorder: default network callbacks, validated internet status,
    foreground recording, timestamped CSV, tests, device demonstration.
-2. Native diagnostics: portable C++ TCP connect timing and UDP echo against an
-   owned endpoint, explicit timeouts/cancellation, RAII cleanup, Linux tests,
-   then Android JNI. NDK installation alone does not establish C++ experience.
+2. Native diagnostics: C++ TCP connect timing and UDP echo, explicit deadlines/
+   cancellation, RAII cleanup, and Android JNI are implemented in v0.2. Ten
+   native Android tests and seven JNI/ViewModel tests passed; see the native
+   milestone report. Linux host CI verifies the portable core. Repeatable LAN
+   measurements and native-result export are follow-up work.
 3. Android IPC: separate-process AIDL service with concurrent requests,
    callbacks, process death, and reconnection tests.
 4. Audio: phone-to-computer streaming, sequence numbers, jitter buffer,

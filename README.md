@@ -1,14 +1,13 @@
 # NetDiag — Android Connectivity Diagnostics
 
-[![Android build](https://github.com/Fazlul105/NetDiag/actions/workflows/android.yml/badge.svg)](https://github.com/Fazlul105/NetDiag/actions/workflows/android.yml)
+[![Android build](https://github.com/Fazlul105/NetDiag/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/Fazlul105/NetDiag/actions/workflows/android.yml)
 
-A Kotlin and Jetpack Compose app that records changes to an Android phone's
-default network and exports a timestamped diagnostic timeline as CSV.
+A Kotlin and Jetpack Compose app that records Android network changes and runs
+C++ TCP-connect and UDP-echo diagnostics through the Android NDK and JNI.
 
-**Status: working v0.1, in development.** Tested on a Redmi Note 11 running
-Android 13. The current implementation covers connectivity monitoring and
-foreground session recording. Native TCP/UDP diagnostics, JNI, and AIDL are
-planned milestones.
+**Version 0.2.** Tested on a Redmi Note 11
+running Android 13. C++ TCP/UDP probes, JNI integration, cancellation, and native
+tests are implemented. AIDL and audio transport remain planned milestones.
 
 ## What it does
 
@@ -18,11 +17,18 @@ planned milestones.
 - Records UTC and monotonic timestamps for network events in a start/stop session.
 - Shows the event timeline and exports CSV through Android's document picker.
 - Unregisters callbacks when monitoring ends and retains state across rotation.
+- Runs one TCP connection or UDP echo probe against a numeric IPv4/IPv6 endpoint.
+- Handles deadlines, cancellation, connection refusal, and malformed UDP echoes
+  in C++ with RAII socket ownership; executes native work off the UI thread.
+- Returns typed native results through registered JNI methods to observable UI state.
 
 ## Screenshots
 
-These screenshots show the beginning and end of the same seven-event session
-recorded on the Redmi Note 11.
+Native UDP echo to a device-local test server (a JNI demonstration, not Wi-Fi RTT):
+
+<img src="docs/images/native-udp-result.png" alt="NetDiag native UDP echo result on Redmi Note 11" width="300" />
+
+The v0.1 screenshots below show the same seven-event connectivity session:
 
 <p>
   <img src="docs/images/session-start.png" alt="NetDiag session showing Wi-Fi loss and reconnection" width="300" />
@@ -34,8 +40,12 @@ recorded on the Redmi Note 11.
 | Check | Result |
 | --- | --- |
 | Debug APK build | Passed |
-| Session and CSV unit tests | 4 passed |
-| Android lint | 0 errors; 5 version-update advisories |
+| JVM unit tests | 7 passed |
+| C++ socket tests on Android ARM64 | 10 passed |
+| Portable C++ socket tests on Linux CI | 10 passed |
+| Android JNI/ViewModel integration tests | 7 passed |
+| Manual TCP/UDP app controls | User confirmed both OK; UDP result captured |
+| Android lint | 0 errors; 7 version-update advisories |
 | Physical device | Redmi Note 11, Android 13 / API 33 |
 | Manual Wi-Fi disconnect/reconnect recording | Passed once; 7 exported events |
 | CSV validation | Expected columns, parseable UTC, strictly increasing monotonic timestamps |
@@ -44,6 +54,8 @@ Read the [device-test report](docs/results/2026-11-12-redmi-wifi.md) and inspect
 the [actual exported CSV](docs/examples/redmi-wifi-session.csv). The report
 distinguishes observed callback intervals from network-performance benchmarks.
 The [remaining device checks](docs/DEVICE_TESTS.md) are explicitly marked pending.
+See the [native milestone report](docs/results/2026-11-12-native-diagnostics.md)
+and [implementation walkthrough](docs/NATIVE_DIAGNOSTICS.md) for the C++/JNI work.
 
 ## Build and run
 
@@ -53,13 +65,14 @@ The [remaining device checks](docs/DEVICE_TESTS.md) are explicitly marked pendin
 - Android Studio or Android SDK command-line tools.
 - Android SDK platform 36 and build tools 36.0.0.
 - Android NDK 27.2.12479018, used when packaging native dependencies.
-- An Android 8.0+ device or emulator; real cellular testing requires a phone.
+- SDK CMake 3.22.1.
+- An Android 8.0+ ARM64 device or x86_64 emulator; real cellular testing requires a phone.
 
 Install the pinned SDK packages through Android Studio's SDK Manager, or with
 the current Android CLI:
 
 ```sh
-android sdk install platforms/android-36 build-tools/36.0.0 ndk/27.2.12479018
+android sdk install platforms/android-36 build-tools/36.0.0 ndk/27.2.12479018 cmake/3.22.1
 ```
 
 Set `JAVA_HOME` to JDK 21 and `ANDROID_HOME` to your Android SDK. Android Studio
@@ -73,8 +86,8 @@ cd NetDiag
 
 On Windows, use `gradlew.bat` in place of `./gradlew`. The wrapper pins Gradle
 8.13 and verifies its distribution checksum. The project uses AGP 8.13.2,
-Kotlin 2.2.21, and minimum SDK 26. CMake is optional until the native diagnostics
-milestone is implemented.
+Kotlin 2.2.21, and minimum SDK 26. Native libraries are built for arm64-v8a and
+x86_64, with 16 KB ELF segment alignment enabled.
 
 The APK is generated at `app/build/outputs/apk/debug/app-debug.apk`. GitHub
 Actions also uploads the debug APK and test/lint reports as workflow artifacts.
@@ -108,7 +121,9 @@ an optional `-Serial` argument.
 
 `MainActivity` renders the UI and owns the export picker. `DiagnosticsModel`
 observes network callbacks and exposes immutable state. `Session` holds the
-Android-independent recording and CSV logic covered by unit tests.
+Android-independent recording and CSV logic. The portable C++ socket core lives
+in `native/`; `NativeProbeModel` dispatches JNI work on an IO worker and exposes
+the result to Compose. Native results are separate from the event-session CSV.
 
 Recording runs while the app is visible and ends when the app leaves the
 foreground. Sessions are kept in memory until exported; process termination
@@ -121,17 +136,18 @@ See the [architecture notes](docs/ARCHITECTURE.md) and
 
 ## Roadmap
 
-- **Current:** connectivity monitoring, session timeline, CSV export, unit tests,
-  and a documented physical-device test.
-- **Next:** C++ TCP-connect timing and UDP echo, explicit timeouts and cleanup,
-  then Android integration through NDK/JNI.
-- **Later:** a separate-process AIDL service, audio transport, and repeatable
+- **Current:** connectivity recording/CSV plus C++ TCP-connect timing and UDP echo
+  through JNI, with deadlines, cancellation, and native/integration tests.
+- **Next:** repeatable LAN measurements, native-result export, and a separate-process
+  AIDL service.
+- **Later:** audio transport and repeatable
   interruption/recovery investigations.
 - **Optional:** supported hardware peripherals, Linux drivers, and Android
   platform/HAL work in an appropriate environment.
 
-See the [milestone plan](docs/ROADMAP.md). Installing native tools does not
-establish native networking, HAL, kernel-driver, or physical-bus implementation.
+See the [milestone plan](docs/ROADMAP.md). The current native work is
+application-level networking. HAL, kernel-driver, modem, and physical-bus work
+remain separate milestones.
 
 ## Development
 

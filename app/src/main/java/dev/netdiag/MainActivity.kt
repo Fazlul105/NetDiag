@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : ComponentActivity() {
     private lateinit var model: DiagnosticsModel
+    private lateinit var probeModel: NativeProbeModel
     private var pendingCsv: String? = null
     private val export = registerForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
         val snapshot = pendingCsv
@@ -35,37 +36,42 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         model = ViewModelProvider(this)[DiagnosticsModel::class.java]
+        probeModel = ViewModelProvider(this)[NativeProbeModel::class.java]
         pendingCsv = savedInstanceState?.getString("pendingCsv")
         setContent {
             val state by model.state.collectAsState()
+            val probeState by probeModel.state.collectAsState()
             MaterialTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    Column(Modifier.fillMaxSize().safeDrawingPadding().padding(20.dp),
+                    LazyColumn(Modifier.fillMaxSize().safeDrawingPadding().padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text("NetDiag", style = MaterialTheme.typography.headlineLarge)
-                        Text("Connectivity diagnostics", style = MaterialTheme.typography.titleMedium)
-                        Text(state.network)
-                        Text("Record while this app is visible. Leaving the app ends the session.")
-                        state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(onClick = { if (state.recording) model.stop() else model.start() }) {
-                                Text(if (state.recording) "Stop session" else "Start session")
-                            }
-                            OutlinedButton(enabled = !state.recording && state.events.isNotEmpty(),
-                                onClick = {
-                                    pendingCsv = model.csv()
-                                    export.launch("netdiag-${System.currentTimeMillis()}.csv")
-                                }) { Text("Export CSV") }
+                        item {
+                            Text("NetDiag", style = MaterialTheme.typography.headlineLarge)
+                            Text("Connectivity diagnostics", style = MaterialTheme.typography.titleMedium)
+                            Text(state.network)
                         }
-                        Text("${state.events.size} events", style = MaterialTheme.typography.titleSmall)
-                        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(state.events) { event ->
-                                Card(Modifier.fillMaxWidth()) {
-                                    Column(Modifier.padding(12.dp)) {
-                                        Text(event.type, style = MaterialTheme.typography.labelLarge)
-                                        Text(event.detail)
-                                        Text(event.wallTime.toString(), style = MaterialTheme.typography.bodySmall)
-                                    }
+                        item { NativeProbePanel(probeState, probeModel::start, probeModel::cancel) }
+                        item {
+                            Text("Record while this app is visible. Leaving the app ends the session.")
+                            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(onClick = { if (state.recording) model.stop() else model.start() }) {
+                                    Text(if (state.recording) "Stop session" else "Start session")
+                                }
+                                OutlinedButton(enabled = !state.recording && state.events.isNotEmpty(),
+                                    onClick = {
+                                        pendingCsv = model.csv()
+                                        export.launch("netdiag-${System.currentTimeMillis()}.csv")
+                                    }) { Text("Export CSV") }
+                            }
+                            Text("${state.events.size} events", style = MaterialTheme.typography.titleSmall)
+                        }
+                        items(state.events) { event ->
+                            Card(Modifier.fillMaxWidth()) {
+                                Column(Modifier.padding(12.dp)) {
+                                    Text(event.type, style = MaterialTheme.typography.labelLarge)
+                                    Text(event.detail)
+                                    Text(event.wallTime.toString(), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
@@ -77,7 +83,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() { super.onStart(); model.attach() }
     override fun onStop() {
-        if (!isChangingConfigurations) model.detach()
+        if (!isChangingConfigurations) { model.detach(); probeModel.cancel() }
         super.onStop()
     }
     override fun onSaveInstanceState(outState: Bundle) {
