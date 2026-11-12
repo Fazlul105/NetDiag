@@ -5,8 +5,10 @@
 2. Native diagnostics: C++ TCP connect timing and UDP echo, explicit deadlines/
    cancellation, RAII cleanup, and Android JNI are implemented in v0.2. Ten
    native Android tests and seven JNI/ViewModel tests passed; see the native
-   milestone report. Linux host CI verifies the portable core. Repeatable LAN
-   measurements and native-result export are follow-up work.
+   milestone report. Linux host CI verifies the portable core. Five physical
+   phone-to-laptop Wi-Fi recovery trials and automatic TCP-result CSV recording
+   are documented in results/2026-11-12-wifi-recovery.md. One-off UDP-result
+   export and broader transition measurements remain follow-up work.
 3. Android IPC: separate-process AIDL service with concurrent requests,
    callbacks, process death, and reconnection tests.
 4. Audio: phone-to-computer streaming, sequence numbers, jitter buffer,

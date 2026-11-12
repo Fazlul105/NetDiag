@@ -50,7 +50,8 @@ class MainActivity : ComponentActivity() {
                             Text("Connectivity diagnostics", style = MaterialTheme.typography.titleMedium)
                             Text(state.network)
                         }
-                        item { NativeProbePanel(probeState, probeModel::start, probeModel::cancel) }
+                        item { NativeProbePanel(probeState, probeModel::start, probeModel::cancel,
+                            state.recording, model::startRecovery) }
                         item {
                             Text("Record while this app is visible. Leaving the app ends the session.")
                             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }

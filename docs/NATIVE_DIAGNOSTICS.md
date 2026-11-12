@@ -119,8 +119,10 @@ echo; entering an arbitrary internet service's port is not an echo test.
 
 ## Current limits
 
-Only the most recent native result is displayed. It is not yet part of the
-connectivity-session CSV. Supported packaged ABIs are arm64-v8a and x86_64.
+One-off TCP/UDP controls display their most recent result. The separate
+**Record Wi-Fi recovery** mode exports automatic TCP attempts and outcomes in
+the connectivity-session CSV. See the [physical Wi-Fi recovery experiment](results/2026-11-12-wifi-recovery.md).
+Supported packaged ABIs are arm64-v8a and x86_64.
 The C++/JNI implementation is application-level networking; AIDL, HAL, modem,
 kernel driver, audio, and hardware buses remain separate milestones.
 
