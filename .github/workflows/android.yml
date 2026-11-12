@@ -2,7 +2,7 @@ name: Android build
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/native-diagnostics]
   pull_request:
   workflow_dispatch:
 
@@ -14,6 +14,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  native-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build portable C++ core
+        run: cmake -S native -B native/build -DCMAKE_BUILD_TYPE=Debug && cmake --build native/build
+      - name: Run Linux loopback tests
+        run: ctest --test-dir native/build --output-on-failure
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -33,10 +45,10 @@ jobs:
         run: |
           if [[ -x "$ANDROID_HOME/cmdline-tools/latest/bin/android" ]]; then
             "$ANDROID_HOME/cmdline-tools/latest/bin/android" --sdk="$ANDROID_HOME" sdk install \
-              platforms/android-36 build-tools/36.0.0 ndk/27.2.12479018
+              platforms/android-36 build-tools/36.0.0 ndk/27.2.12479018 cmake/3.22.1
           else
             "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
-              'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018'
+              'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
           fi
       - name: Build, test, and lint
         run: ./gradlew --no-daemon assembleDebug testDebugUnitTest lintDebug
