@@ -21,6 +21,7 @@ tests are implemented. AIDL and audio transport remain planned milestones.
 - Handles deadlines, cancellation, connection refusal, and malformed UDP echoes
   in C++ with RAII socket ownership; executes native work off the UI thread.
 - Returns typed native results through registered JNI methods to observable UI state.
+- Records automatic TCP recovery attempts after Wi-Fi loss/reconnection in the session CSV.
 
 ## Screenshots
 
@@ -40,7 +41,7 @@ The v0.1 screenshots below show the same seven-event connectivity session:
 | Check | Result |
 | --- | --- |
 | Debug APK build | Passed |
-| JVM unit tests | 7 passed |
+| JVM unit tests | 10 passed |
 | C++ socket tests on Android ARM64 | 10 passed |
 | Portable C++ socket tests on Linux CI | 10 passed |
 | Android JNI/ViewModel integration tests | 7 passed |
@@ -49,6 +50,7 @@ The v0.1 screenshots below show the same seven-event connectivity session:
 | Physical device | Redmi Note 11, Android 13 / API 33 |
 | Manual Wi-Fi disconnect/reconnect recording | Passed once; 7 exported events |
 | CSV validation | Expected columns, parseable UTC, strictly increasing monotonic timestamps |
+| Phone-to-laptop Wi-Fi recovery | 5/5 trials succeeded; median observed TCP recovery 207.602 ms |
 
 Read the [device-test report](docs/results/2026-11-12-redmi-wifi.md) and inspect
 the [actual exported CSV](docs/examples/redmi-wifi-session.csv). The report
@@ -56,6 +58,9 @@ distinguishes observed callback intervals from network-performance benchmarks.
 The [remaining device checks](docs/DEVICE_TESTS.md) are explicitly marked pending.
 See the [native milestone report](docs/results/2026-11-12-native-diagnostics.md)
 and [implementation walkthrough](docs/NATIVE_DIAGNOSTICS.md) for the C++/JNI work.
+The [five-trial Wi-Fi recovery report](docs/results/2026-11-12-wifi-recovery.md)
+includes the method, reviewed CSV, individual measurements, and a case where
+TCP reachability followed Android internet validation by about 1.056 seconds.
 
 ## Build and run
 

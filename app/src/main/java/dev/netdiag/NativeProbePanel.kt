@@ -12,7 +12,8 @@ import androidx.compose.ui.unit.dp
 import java.util.Locale
 
 @Composable
-fun NativeProbePanel(state: ProbeState, start: (Int, String, String, String) -> Unit, cancel: () -> Unit) {
+fun NativeProbePanel(state: ProbeState, start: (Int, String, String, String) -> Unit, cancel: () -> Unit,
+    recording: Boolean, startRecovery: (String, String) -> Unit) {
     var address by rememberSaveable { mutableStateOf("") }
     var port by rememberSaveable { mutableStateOf("7777") }
     var timeout by rememberSaveable { mutableStateOf("1500") }
@@ -31,6 +32,9 @@ fun NativeProbePanel(state: ProbeState, start: (Int, String, String, String) -> 
                     enabled = !state.working, label = { Text("Timeout (ms)") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f).testTag("native_timeout"))
             }
+            OutlinedButton(enabled = !state.working && !recording,
+                onClick = { startRecovery(address, port) }) { Text("Record Wi-Fi recovery") }
+            Text("Recovery recording checks TCP after Wi-Fi returns and includes results in CSV.")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(enabled = !state.working, onClick = { start(0, address, port, timeout) },
                     modifier = Modifier.weight(1f).testTag("native_tcp")) { Text("TCP connect") }
